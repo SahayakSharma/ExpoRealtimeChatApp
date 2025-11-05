@@ -8,7 +8,9 @@ export default function RootLayout() {
 
   return (
     <AuthContextProvider>
-      <Stack>
+      <Stack screenOptions={{
+        headerShown:false
+      }}>
         <Stack.Screen name="index" options={{ headerShown: false }} />
       </Stack>
     </AuthContextProvider>
