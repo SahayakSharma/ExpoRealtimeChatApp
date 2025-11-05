@@ -1,14 +1,9 @@
-import { Text } from "react-native";
-import { SafeAreaView } from "react-native-safe-area-context";
-
-
+import { useAuthContext } from "@/context/Auth/AuthContext";
+import { Redirect } from "expo-router";
 
 export default function App(){
-    return(
-        <SafeAreaView className="p-10">
-            <Text className="font-bold">
-                hi there
-            </Text>
-        </SafeAreaView>
-    )
+
+    const {isAuthenticated} = useAuthContext();
+
+    return isAuthenticated ? <Redirect href="/(tab)/home"/> : <Redirect href="/(auth)/signIn"/>
 }
