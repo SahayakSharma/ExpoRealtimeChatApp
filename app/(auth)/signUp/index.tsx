@@ -12,12 +12,25 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import CustomButton from "../components/CustomButton";
 import CustomInput from "../components/CustomInput";
 import SocialButton from "../components/SocialButton";
+import { createAccountWithEmailAndPassword } from "./helper/signUpHelperFunction";
+import { router } from "expo-router";
 
 export default function SignUp() {
   const [fullName, setFullName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
+  const [signUpError, setSignUpError]= useState<String|null>(null);
+
+  async function handleSignUp() {
+    try{
+      await createAccountWithEmailAndPassword(email, password);
+      router.push('/(auth)/signIn');
+    } 
+    catch(error){
+      setSignUpError(error instanceof Error ? error.message : String(error));
+    }
+  }
 
   return (
     <SafeAreaView className="flex-1 bg-gray-950">
@@ -52,7 +65,6 @@ export default function SignUp() {
 
           <View className="flex-1 px-6 -mt-8">
             <View className="bg-gray-900 rounded-3xl p-6 shadow-2xl border border-gray-800">
-    \
               <View className="mb-6">
                 <CustomInput
                   label="Full Name"
@@ -103,10 +115,14 @@ export default function SignUp() {
                   </Text>
                 </Text>
               </View>
-
+              {
+                signUpError && <Text className="text-red-500 font-semibold text-sm text-right">
+                  {signUpError}
+                </Text>
+              }
               <CustomButton
                 title="Create Account"
-                onPress={() => {}}
+                onPress={() => handleSignUp()}
                 variant="primary"
               />
 
@@ -138,7 +154,9 @@ export default function SignUp() {
               <Text className="text-gray-400 text-base">
                 Already have an account?{" "}
               </Text>
-              <TouchableOpacity activeOpacity={0.7}>
+              <TouchableOpacity activeOpacity={0.7} onPress={()=>{
+                router.push("/(auth)/signIn")
+              }}>
                 <Text className="text-purple-400 font-semibold text-base">
                   Sign In
                 </Text>

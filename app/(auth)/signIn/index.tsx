@@ -1,22 +1,39 @@
 import { LinearGradient } from "expo-linear-gradient";
 import { useState } from "react";
 import {
-    KeyboardAvoidingView,
-    Platform,
-    ScrollView,
-    Text,
-    TouchableOpacity,
-    View,
+  KeyboardAvoidingView,
+  Platform,
+  ScrollView,
+  Text,
+  TouchableOpacity,
+  View,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import CustomButton from "../components/CustomButton";
 import CustomInput from "../components/CustomInput";
 import SocialButton from "../components/SocialButton";
 import { router } from "expo-router";
+import { signInWithEmailAndPassword } from "./helper/signInFunctions";
+import { signInWithGoogle } from "./helper/signInFunctions";
+
 export default function SignIn() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [signInError, setSignInError] = useState<String | null>(null);
 
+  async function handleSignIn(method: 'emailPassword' | 'google' | 'apple') {
+    try {
+      if (method === 'emailPassword') {
+        await signInWithEmailAndPassword(email, password);
+      }
+      else if (method === 'google') {
+        await signInWithGoogle();
+      }
+    }
+    catch (error) {
+      setSignInError(error instanceof Error ? error.message : String(error));
+    }
+  }
   return (
     <SafeAreaView className="flex-1 bg-gray-950">
       <KeyboardAvoidingView
@@ -71,7 +88,11 @@ export default function SignIn() {
                   icon="lock-closed-outline"
                 />
               </View>
-
+              {
+                signInError && <Text className="text-red-500 font-semibold text-sm text-right">
+                  {signInError}
+                </Text>
+              }
               <TouchableOpacity
                 className="self-end mb-6"
                 activeOpacity={0.7}
@@ -83,7 +104,7 @@ export default function SignIn() {
 
               <CustomButton
                 title="Sign In"
-                onPress={() => {}}
+                onPress={() => handleSignIn('emailPassword')}
                 variant="primary"
               />
 
@@ -99,13 +120,13 @@ export default function SignIn() {
                 <SocialButton
                   icon="logo-google"
                   title="Google"
-                  onPress={() => {}}
+                  onPress={() => handleSignIn('google')}
                   iconColor="#EA4335"
                 />
                 <SocialButton
                   icon="logo-apple"
                   title="Apple"
-                  onPress={() => {}}
+                  onPress={() => { }}
                   iconColor="#fff"
                 />
               </View>
@@ -115,7 +136,7 @@ export default function SignIn() {
               <Text className="text-gray-400 text-base">
                 Don't have an account?{" "}
               </Text>
-              <TouchableOpacity activeOpacity={0.7} onPress={()=>router.push('/(auth)/signUp')}>
+              <TouchableOpacity activeOpacity={0.7} onPress={() => router.push('/(auth)/signUp')}>
                 <Text className="text-blue-400 font-semibold text-base">
                   Sign Up
                 </Text>
