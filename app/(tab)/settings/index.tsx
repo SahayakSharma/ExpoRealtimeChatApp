@@ -1,10 +1,9 @@
-import { Text,ColorValue } from "react-native";
-import { SafeAreaView } from "react-native-safe-area-context";
-import { LinearGradient } from "expo-linear-gradient";
 import { gradientBackgroundColors } from "@/lib/global/colorTheme";
+import { LinearGradient } from "expo-linear-gradient";
+import SettingsHome from "@/components/screenComponents/settings/SettingsHome";
 
-export default function Calls(){
-
+export default function Settings(){
+    
         return (
             <LinearGradient
                 colors={gradientBackgroundColors}
@@ -12,9 +11,7 @@ export default function Calls(){
                 end={{ x: 1, y: 1 }}
                 className="flex-1"
             >
-                <SafeAreaView>
-                    <Text>hi there search</Text>
-                </SafeAreaView>
+                <SettingsHome />
             </LinearGradient>
         )
 }
