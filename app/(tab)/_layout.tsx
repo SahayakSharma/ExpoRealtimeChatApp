@@ -1,5 +1,6 @@
 import { useAuthContext } from "@/context/Auth/AuthContext";
-import { Stack, router } from "expo-router";
+import { Entypo } from "@expo/vector-icons";
+import { Tabs, router } from "expo-router";
 import { useEffect } from "react";
 
 export default function RootProtectedLayout() {
@@ -13,8 +14,15 @@ export default function RootProtectedLayout() {
     }, [isAuthenticated])
 
     return (
-        <Stack>
-            <Stack.Screen name="(tab)/home/index" options={{ headerShown: false }} />
-        </Stack>
+        <Tabs>
+            <Tabs.Screen name="chats/index" options={{
+                tabBarLabel: "Messages",
+                tabBarIcon: () => <Entypo name="chat" size={24} color="black" />
+            }} />
+            <Tabs.Screen name="calls/index" options={{
+                tabBarLabel: "Calls",
+                tabBarIcon: () => <Entypo name="phone" size={24} color="black" />
+            }} />
+        </Tabs>
     )
 }

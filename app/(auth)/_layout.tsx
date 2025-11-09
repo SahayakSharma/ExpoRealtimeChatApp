@@ -7,7 +7,7 @@ export default function RootAuthLayout(){
 
     useEffect(()=>{
         if(isAuthenticated){
-            router.replace("/(tab)/home");
+            router.replace("/(tab)/chats");
         }
     },[isAuthenticated])
     

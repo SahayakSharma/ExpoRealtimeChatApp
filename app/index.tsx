@@ -5,5 +5,5 @@ export default function App(){
 
     const {isAuthenticated} = useAuthContext();
 
-    return isAuthenticated ? <Redirect href="/(tab)/home"/> : <Redirect href="/(auth)/signIn"/>
+    return isAuthenticated ? <Redirect href="/(tab)/chats"/> : <Redirect href="/(auth)/signIn"/>
 }
