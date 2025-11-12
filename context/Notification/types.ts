@@ -13,6 +13,7 @@ export interface FriendRequestNotification {
 
 export interface NotificationContextState {
   notifications: FriendRequestNotification[];
+  unreadCount: number;
   isLoading: boolean;
   error: string | null;
 }
@@ -20,6 +21,7 @@ export interface NotificationContextState {
 export interface NotificationContextValue extends NotificationContextState {
   acceptRequest: (requestId: string, userName: string) => Promise<void>;
   rejectRequest: (requestId: string) => Promise<void>;
+  markAsViewed: () => void;
   clearError: () => void;
 }
 

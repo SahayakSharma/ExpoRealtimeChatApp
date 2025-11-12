@@ -1,9 +1,18 @@
+import { FriendRequestStatus } from '@/components/screenComponents/search/helper/friendRequestService';
 import React, { createContext, useContext, useEffect, useState } from 'react';
 import { Alert } from 'react-native';
 import { acceptFriendRequest, rejectFriendRequest, setupNotificationListener } from './notificationService';
-import { NotificationContextState, NotificationContextValue, NotificationProviderProps } from './types';
+import { FriendRequestNotification, NotificationContextState, NotificationContextValue, NotificationProviderProps } from './types';
 
 const NotificationContext = createContext<NotificationContextValue | undefined>(undefined);
+
+const calculateUnreadCount = (notifications: FriendRequestNotification[]): number => {
+  return notifications.filter(
+    notification => 
+      notification.type === "incoming" && 
+      notification.status === FriendRequestStatus.PENDING
+  ).length;
+};
 
 export const NotificationProvider: React.FC<NotificationProviderProps> = ({ 
   userId, 
@@ -11,9 +20,11 @@ export const NotificationProvider: React.FC<NotificationProviderProps> = ({
 }) => {
   const [state, setState] = useState<NotificationContextState>({
     notifications: [],
+    unreadCount: 0,
     isLoading: true,
     error: null,
   });
+  const [hasViewed, setHasViewed] = useState(false);
 
   useEffect(() => {
     if (!userId) {
@@ -26,8 +37,16 @@ export const NotificationProvider: React.FC<NotificationProviderProps> = ({
     }
 
     const handleNotificationsUpdate = (notifications: NotificationContextState['notifications']) => {
+      const actualUnreadCount = calculateUnreadCount(notifications);
+      const displayUnreadCount = hasViewed ? 0 : actualUnreadCount;
+      
+      if (actualUnreadCount > state.unreadCount && hasViewed) {
+        setHasViewed(false);
+      }
+      
       setState({
         notifications,
+        unreadCount: displayUnreadCount,
         isLoading: false,
         error: null,
       });
@@ -104,10 +123,19 @@ export const NotificationProvider: React.FC<NotificationProviderProps> = ({
     }));
   };
 
+  const markAsViewed = (): void => {
+    setHasViewed(true);
+    setState(prev => ({
+      ...prev,
+      unreadCount: 0,
+    }));
+  };
+
   const contextValue: NotificationContextValue = {
     ...state,
     acceptRequest,
     rejectRequest,
+    markAsViewed,
     clearError,
   };
 

@@ -1,12 +1,16 @@
 import { useNotifications } from "@/context/Notification/NotificationContext";
 import { Ionicons } from "@expo/vector-icons";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { ActivityIndicator, FlatList, RefreshControl, Text, View } from "react-native";
 import FriendRequestCard from "./FriendRequestCard";
 
 export default function NotificationsScreen() {
-  const { notifications, isLoading } = useNotifications();
+  const { notifications, isLoading, markAsViewed } = useNotifications();
   const [isRefreshing, setIsRefreshing] = useState(false);
+
+  useEffect(() => {
+    markAsViewed();
+  }, []);
 
   const handleRefresh = async () => {
     setIsRefreshing(true);

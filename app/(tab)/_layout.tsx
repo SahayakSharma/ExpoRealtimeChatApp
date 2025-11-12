@@ -1,19 +1,43 @@
 import { useAuthContext } from "@/context/Auth/AuthContext";
+import { NotificationProvider, useNotifications } from "@/context/Notification/NotificationContext";
 import { Entypo } from "@expo/vector-icons";
 import { Tabs, router } from "expo-router";
 import { useEffect } from "react";
 import { Text, TouchableOpacity, View } from "react-native";
 
-export default function RootProtectedLayout() {
+function NotificationTabIcon({ color }: { color: string }) {
+    const { unreadCount } = useNotifications();
 
-    const { isAuthenticated } = useAuthContext();
+    return (
+        <View>
+            <Entypo name="bell" size={24} color={color} />
+            {unreadCount > 0 && (
+                <View style={{
+                    position: 'absolute',
+                    top: -4,
+                    right: -4,
+                    backgroundColor: '#ef4444',
+                    borderRadius: 9,
+                    minWidth: 18,
+                    height: 18,
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    paddingHorizontal: 4,
+                }}>
+                    <Text style={{
+                        color: '#ffffff',
+                        fontSize: 10,
+                        fontWeight: 'bold',
+                    }}>
+                        {unreadCount > 9 ? '9+' : unreadCount}
+                    </Text>
+                </View>
+            )}
+        </View>
+    );
+}
 
-    useEffect(() => {
-        if (!isAuthenticated) {
-            router.replace("/(auth)/signIn");
-        }
-    }, [isAuthenticated])
-
+function TabsLayout() {
     return (
         <Tabs screenOptions={{
             tabBarStyle: {
@@ -66,7 +90,7 @@ export default function RootProtectedLayout() {
             }} />
             <Tabs.Screen name="notifications/index" options={{
                 tabBarLabel: "Notifications",
-                tabBarIcon: ({ color }) => <Entypo name="bell" size={24} color={color} />,
+                tabBarIcon: ({ color }) => <NotificationTabIcon color={color} />,
                 headerTitle: () => (
                     <View className="w-full px-2 flex-row justify-between items-center">
                         <Text className="font-semibold text-3xl">Notifications</Text>
@@ -93,5 +117,26 @@ export default function RootProtectedLayout() {
                 )
             }} />
         </Tabs>
+    );
+}
+
+export default function RootProtectedLayout() {
+
+    const { isAuthenticated, currentUserSession } = useAuthContext();
+
+    useEffect(() => {
+        if (!isAuthenticated) {
+            router.replace("/(auth)/signIn");
+        }
+    }, [isAuthenticated])
+
+    if (!currentUserSession) {
+        return null;
+    }
+
+    return (
+        <NotificationProvider userId={currentUserSession.uid}>
+            <TabsLayout />
+        </NotificationProvider>
     )
 }
