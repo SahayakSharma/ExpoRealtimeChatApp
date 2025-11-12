@@ -107,7 +107,7 @@ export const AuthContextProvider = ({ children }: { children: React.ReactNode })
                 userData = userRec.data();
                 setCurrentUserDetails(userData); 
             } else {
-                const payload = await createUserRecord();
+                const payload = await createUserRecord(uid);
                 userData = payload;
                 setCurrentUserDetails(payload);
             }
@@ -121,14 +121,14 @@ export const AuthContextProvider = ({ children }: { children: React.ReactNode })
         }
     }
 
-    async function createUserRecord():Promise<FirebaseFirestoreTypes.DocumentData> {
+    async function createUserRecord(uid:string):Promise<FirebaseFirestoreTypes.DocumentData> {
         const payload = {
             name: currentUserSession?.displayName || null,
             email: currentUserSession?.email || null,
             phone_number: currentUserSession?.phoneNumber || null,
             createdAt: serverTimestamp()
         };
-        await setUserDetailsRecord(currentUserSession!.uid, payload, instance.getDb());
+        await setUserDetailsRecord(uid, payload, instance.getDb());
         return payload
     }
 

@@ -19,7 +19,8 @@ export default function RootProtectedLayout() {
             tabBarStyle: {
                 backgroundColor: '#EFE9E3',
                 height: 100,
-                paddingTop: 15
+                paddingTop: 15,
+                paddingHorizontal:10
             },
             tabBarActiveTintColor: '#000000',
             tabBarLabelStyle: {
@@ -30,19 +31,10 @@ export default function RootProtectedLayout() {
                 backgroundColor: '#EFE9E3',
             }
         }}>
-            <Tabs.Screen name="chats/index" options={{
+            <Tabs.Screen name="chats" options={{
                 tabBarLabel: "Messages",
                 tabBarIcon: ({ color }) => <Entypo name="chat" size={24} color={color} />,
-                headerTitle: () => (
-                    <View className="w-full px-2 flex-row justify-between items-center">
-                        <Text className="font-semibold text-3xl">Messages</Text>
-                        <View className="flex-row gap-5 items-center">
-                            <TouchableOpacity onPress={()=>router.push("/(tab)/search")}>
-                                <Entypo name="plus" size={30} color={'#000000'} />
-                            </TouchableOpacity>
-                        </View>
-                    </View>
-                )
+                headerShown:false
             }} />
             <Tabs.Screen name="calls/index" options={{
                 tabBarLabel: "Calls",
@@ -64,6 +56,20 @@ export default function RootProtectedLayout() {
                 headerTitle: () => (
                     <View className="w-full px-2 flex-row justify-between items-center">
                         <Text className="font-semibold text-3xl">Find Someone</Text>
+                        <View className="flex-row gap-5 items-center">
+                            <TouchableOpacity onPress={()=>router.push("/(tab)/chats")}>
+                                <Entypo name="chat" size={24} color={'#000000'} />
+                            </TouchableOpacity>
+                        </View>
+                    </View>
+                )
+            }} />
+            <Tabs.Screen name="notifications/index" options={{
+                tabBarLabel: "Notifications",
+                tabBarIcon: ({ color }) => <Entypo name="bell" size={24} color={color} />,
+                headerTitle: () => (
+                    <View className="w-full px-2 flex-row justify-between items-center">
+                        <Text className="font-semibold text-3xl">Notifications</Text>
                         <View className="flex-row gap-5 items-center">
                             <TouchableOpacity onPress={()=>router.push("/(tab)/chats")}>
                                 <Entypo name="chat" size={24} color={'#000000'} />

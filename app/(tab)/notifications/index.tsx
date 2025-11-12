@@ -1,9 +1,9 @@
-import SearchScreen from "@/components/screenComponents/search/components/SearchScreen";
+import NotificationsScreen from "@/components/screenComponents/notifications/components/NotificationsScreen";
 import { gradientBackgroundColors } from "@/lib/global/colorTheme";
 import { LinearGradient } from "expo-linear-gradient";
 import { SafeAreaView } from "react-native-safe-area-context";
 
-export default function Search() {
+export default function Notifications() {
     return (
         <LinearGradient
             colors={gradientBackgroundColors}
@@ -12,7 +12,7 @@ export default function Search() {
             className="flex-1"
         >
             <SafeAreaView className="flex-1">
-                <SearchScreen />
+                <NotificationsScreen />
             </SafeAreaView>
         </LinearGradient>
     );
