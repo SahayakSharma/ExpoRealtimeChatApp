@@ -1,52 +1,18 @@
-import { FriendRequestStatus } from "@/components/screenComponents/search/helper/friendRequestService";
-import { useAuthContext } from "@/context/Auth/AuthContext";
+import { useNotifications } from "@/context/Notification/NotificationContext";
 import { Ionicons } from "@expo/vector-icons";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { ActivityIndicator, FlatList, RefreshControl, Text, View } from "react-native";
-import { getFriendRequests } from "../helper/notificationService";
 import FriendRequestCard from "./FriendRequestCard";
 
-export interface FriendRequestNotification {
-  id: string;
-  userId: string;
-  userName: string;
-  userEmail: string;
-  status: FriendRequestStatus;
-  createdAt: any;
-  type: "incoming" | "outgoing";
-}
-
 export default function NotificationsScreen() {
-  const { currentUserSession } = useAuthContext();
-  const [notifications, setNotifications] = useState<FriendRequestNotification[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
+  const { notifications, isLoading } = useNotifications();
   const [isRefreshing, setIsRefreshing] = useState(false);
-
-  useEffect(() => {
-    loadNotifications();
-  }, []);
-
-  const loadNotifications = async () => {
-    if (!currentUserSession) return;
-
-    try {
-      const requests = await getFriendRequests(currentUserSession.uid);
-      setNotifications(requests);
-    } catch (error) {
-      console.error("Error loading notifications:", error);
-    } finally {
-      setIsLoading(false);
-    }
-  };
 
   const handleRefresh = async () => {
     setIsRefreshing(true);
-    await loadNotifications();
-    setIsRefreshing(false);
-  };
-
-  const handleRequestUpdate = () => {
-    loadNotifications();
+    setTimeout(() => {
+      setIsRefreshing(false);
+    }, 500);
   };
 
   const renderEmptyState = () => {
@@ -77,10 +43,7 @@ export default function NotificationsScreen() {
         data={notifications}
         keyExtractor={(item) => item.id}
         renderItem={({ item }) => (
-          <FriendRequestCard
-            notification={item}
-            onRequestUpdate={handleRequestUpdate}
-          />
+          <FriendRequestCard notification={item} />
         )}
         contentContainerStyle={{ flexGrow: 1 }}
         ListEmptyComponent={renderEmptyState}

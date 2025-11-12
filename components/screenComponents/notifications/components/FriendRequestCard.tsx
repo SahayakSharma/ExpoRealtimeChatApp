@@ -1,31 +1,27 @@
 import { FriendRequestStatus } from "@/components/screenComponents/search/helper/friendRequestService";
+import { useNotifications } from "@/context/Notification/NotificationContext";
+import { FriendRequestNotification } from "@/context/Notification/types";
 import { Ionicons } from "@expo/vector-icons";
 import { useState } from "react";
-import { ActivityIndicator, Alert, Text, TouchableOpacity, View } from "react-native";
-import { updateFriendRequestStatus } from "../helper/notificationService";
-import { FriendRequestNotification } from "./NotificationsScreen";
+import { ActivityIndicator, Text, TouchableOpacity, View } from "react-native";
 
 interface FriendRequestCardProps {
   notification: FriendRequestNotification;
-  onRequestUpdate: () => void;
 }
 
 export default function FriendRequestCard({
   notification,
-  onRequestUpdate,
 }: FriendRequestCardProps) {
+  const { acceptRequest, rejectRequest } = useNotifications();
   const [isProcessing, setIsProcessing] = useState(false);
   const isIncoming = notification.type === "incoming";
 
   const handleAccept = async () => {
     setIsProcessing(true);
     try {
-      await updateFriendRequestStatus(notification.id, FriendRequestStatus.ACCEPTED);
-      Alert.alert("Success", `You are now friends with ${notification.userName}`);
-      onRequestUpdate();
+      await acceptRequest(notification.id, notification.userName);
     } catch (error) {
       console.error("Error accepting friend request:", error);
-      Alert.alert("Error", "Failed to accept friend request");
     } finally {
       setIsProcessing(false);
     }
@@ -34,12 +30,9 @@ export default function FriendRequestCard({
   const handleReject = async () => {
     setIsProcessing(true);
     try {
-      await updateFriendRequestStatus(notification.id, FriendRequestStatus.REJECTED);
-      Alert.alert("Request Declined", "Friend request has been declined");
-      onRequestUpdate();
+      await rejectRequest(notification.id);
     } catch (error) {
       console.error("Error rejecting friend request:", error);
-      Alert.alert("Error", "Failed to decline friend request");
     } finally {
       setIsProcessing(false);
     }

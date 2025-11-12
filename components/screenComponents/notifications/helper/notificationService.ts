@@ -12,7 +12,7 @@ import {
     updateDoc,
     where,
 } from "@react-native-firebase/firestore";
-import { FriendRequestNotification } from "../components/NotificationsScreen";
+import { FriendRequestNotification } from "@/context/Notification/types";
 
 const FRIEND_REQUESTS_COLLECTION = "FriendRequests";
 const USERS_COLLECTION = "Users";
