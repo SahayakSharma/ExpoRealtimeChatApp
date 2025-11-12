@@ -1,37 +1,19 @@
-import { useAuthContext } from "@/context/Auth/AuthContext";
+import { useChatRooms } from "@/context/ChatRooms/ChatRoomsContext";
 import { Ionicons } from "@expo/vector-icons";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { ActivityIndicator, FlatList, RefreshControl, Text, View } from "react-native";
-import { ChatItem, getUserChatsWithDetails } from "../helper/chatService";
 import ChatListItem from "./ChatListItem";
 
 export default function ChatsScreen() {
-  const { currentUserSession } = useAuthContext();
-  const [chats, setChats] = useState<ChatItem[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
+  const { rooms, isLoading, refreshRooms } = useChatRooms();
   const [isRefreshing, setIsRefreshing] = useState(false);
-
-  useEffect(() => {
-    loadChats();
-  }, []);
-
-  const loadChats = async () => {
-    if (!currentUserSession) return;
-
-    try {
-      const chatsList = await getUserChatsWithDetails(currentUserSession.uid);
-      setChats(chatsList);
-    } catch (error) {
-      console.error("Error loading chats:", error);
-    } finally {
-      setIsLoading(false);
-    }
-  };
 
   const handleRefresh = async () => {
     setIsRefreshing(true);
-    await loadChats();
-    setIsRefreshing(false);
+    refreshRooms();
+    setTimeout(() => {
+      setIsRefreshing(false);
+    }, 500);
   };
 
   const renderEmptyState = () => {
@@ -62,9 +44,9 @@ export default function ChatsScreen() {
   return (
     <View className="flex-1">
       <FlatList
-        data={chats}
+        data={rooms}
         keyExtractor={(item) => item.roomId}
-        renderItem={({ item }) => <ChatListItem chat={item} />}
+        renderItem={({ item, index }) => <ChatListItem chat={item} index={index} />}
         contentContainerStyle={{ flexGrow: 1, paddingTop: 8 }}
         ListEmptyComponent={renderEmptyState}
         showsVerticalScrollIndicator={false}

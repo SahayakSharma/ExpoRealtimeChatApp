@@ -3,15 +3,18 @@ import { FirebaseAppConfig } from "@/config/firebaseAppConfig";
 import {
     addDoc,
     collection,
+    doc,
     FirebaseFirestoreTypes,
     onSnapshot,
     orderBy,
     query,
     serverTimestamp,
+    updateDoc,
     where,
 } from "@react-native-firebase/firestore";
 
 const MESSAGES_COLLECTION = "Messages";
+const ROOMS_COLLECTION = "Rooms";
 
 export function setupMessageListener(
   roomId: string,
@@ -53,6 +56,20 @@ export function setupMessageListener(
   return unsubscribe;
 }
 
+async function updateRoomLastMessage(
+  roomId: string,
+  lastMessage: string
+): Promise<void> {
+  const db = FirebaseAppConfig.getInstance().getDb();
+  const roomRef = doc(db, ROOMS_COLLECTION, roomId);
+
+  await updateDoc(roomRef, {
+    lastMessage,
+    lastMessageTimestamp: serverTimestamp(),
+    updatedAt: serverTimestamp(),
+  });
+}
+
 export async function sendMessageToRoom(
   roomId: string,
   senderId: string,
@@ -70,5 +87,12 @@ export async function sendMessageToRoom(
   };
 
   const docRef = await addDoc(messagesCollection, messageData);
+
+  try {
+    await updateRoomLastMessage(roomId, text.trim());
+  } catch (error) {
+    console.error("Chat service: Error updating room last message:", error);
+  }
+
   return docRef.id;
 }

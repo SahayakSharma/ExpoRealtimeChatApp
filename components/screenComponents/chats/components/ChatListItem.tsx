@@ -1,14 +1,16 @@
+import { ChatRoom } from "@/context/ChatRooms/types";
 import { Ionicons } from "@expo/vector-icons";
 import { Image } from "expo-image";
 import { useRouter } from "expo-router";
 import { Text, TouchableOpacity, View } from "react-native";
-import { ChatItem } from "../helper/chatService";
+import Animated, { FadeInDown, Layout } from "react-native-reanimated";
 
 interface ChatListItemProps {
-  chat: ChatItem;
+  chat: ChatRoom;
+  index: number;
 }
 
-export default function ChatListItem({ chat }: ChatListItemProps) {
+export default function ChatListItem({ chat, index }: ChatListItemProps) {
   const router = useRouter();
 
   const getInitials = (name: string) => {
@@ -52,11 +54,15 @@ export default function ChatListItem({ chat }: ChatListItemProps) {
   };
 
   return (
-    <TouchableOpacity
-      onPress={handlePress}
-      activeOpacity={0.7}
-      className="bg-white mx-4 mb-2 rounded-2xl p-4 border border-c3/20"
+    <Animated.View
+      entering={FadeInDown.delay(index * 50).duration(300)}
+      layout={Layout.springify().damping(15).stiffness(100)}
     >
+      <TouchableOpacity
+        onPress={handlePress}
+        activeOpacity={0.7}
+        className="bg-white mx-4 mb-2 rounded-2xl p-4 border border-c3/20"
+      >
       <View className="flex-row items-center">
         {/* Profile Picture / Avatar */}
         <View className="mr-3">
@@ -101,5 +107,6 @@ export default function ChatListItem({ chat }: ChatListItemProps) {
         <Ionicons name="chevron-forward" size={20} color="#C9B59C" />
       </View>
     </TouchableOpacity>
+    </Animated.View>
   );
 }
