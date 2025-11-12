@@ -58,7 +58,8 @@ export function setupMessageListener(
 
 async function updateRoomLastMessage(
   roomId: string,
-  lastMessage: string
+  lastMessage: string,
+  senderId: string
 ): Promise<void> {
   const db = FirebaseAppConfig.getInstance().getDb();
   const roomRef = doc(db, ROOMS_COLLECTION, roomId);
@@ -66,6 +67,7 @@ async function updateRoomLastMessage(
   await updateDoc(roomRef, {
     lastMessage,
     lastMessageTimestamp: serverTimestamp(),
+    lastMessageSenderId: senderId,
     updatedAt: serverTimestamp(),
   });
 }
@@ -89,7 +91,7 @@ export async function sendMessageToRoom(
   const docRef = await addDoc(messagesCollection, messageData);
 
   try {
-    await updateRoomLastMessage(roomId, text.trim());
+    await updateRoomLastMessage(roomId, text.trim(), senderId);
   } catch (error) {
     console.error("Chat service: Error updating room last message:", error);
   }

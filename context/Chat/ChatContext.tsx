@@ -1,5 +1,6 @@
 import React, { createContext, ReactNode, useContext, useEffect, useState } from 'react';
 import { Message } from '../../components/screenComponents/chats/helper/messageService';
+import { markRoomAsRead } from '../ChatRooms/chatRoomsService';
 import { sendMessageToRoom, setupMessageListener } from './chatService';
 import { ChatContextState, ChatContextValue } from './types';
 
@@ -31,6 +32,10 @@ export const ChatProvider: React.FC<ChatProviderProps> = ({
       }));
       return;
     }
+
+    markRoomAsRead(roomId, currentUserId).catch((error) => {
+      console.error('Chat context: Error marking room as read:', error);
+    });
 
     const handleMessagesUpdate = (messages: Message[]) => {
       setState({

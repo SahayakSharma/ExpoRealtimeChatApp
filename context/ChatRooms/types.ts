@@ -8,6 +8,8 @@ export interface ChatRoom {
   otherUserProfilePicture?: string;
   lastMessage?: string;
   lastMessageTimestamp?: FirebaseFirestoreTypes.Timestamp | null;
+  lastMessageSenderId?: string;
+  hasUnreadMessage?: boolean;
   updatedAt?: FirebaseFirestoreTypes.Timestamp | null;
 }
 

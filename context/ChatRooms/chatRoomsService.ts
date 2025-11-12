@@ -6,12 +6,20 @@ import {
     getDoc,
     onSnapshot,
     query,
+    updateDoc,
     where,
 } from "@react-native-firebase/firestore";
 import { ChatRoom } from "./types";
 
 const ROOMS_COLLECTION = "Rooms";
 const USERS_COLLECTION = "Users";
+
+function shouldShowUnreadBadge(lastMessageSenderId: string | undefined, currentUserId: string): boolean {
+  if (!lastMessageSenderId) {
+    return false;
+  }
+  return lastMessageSenderId !== currentUserId;
+}
 
 export function setupRoomsListener(
   userId: string,
@@ -58,6 +66,8 @@ export function setupRoomsListener(
               otherUserProfilePicture: userData.profile_picture,
               lastMessage: roomData.lastMessage,
               lastMessageTimestamp: roomData.lastMessageTimestamp || null,
+              lastMessageSenderId: roomData.lastMessageSenderId,
+              hasUnreadMessage: shouldShowUnreadBadge(roomData.lastMessageSenderId, userId),
               updatedAt: roomData.updatedAt || null,
             };
 
@@ -92,4 +102,35 @@ export function setupRoomsListener(
   );
 
   return unsubscribe;
+}
+
+export async function markRoomAsRead(roomId: string, userId: string): Promise<void> {
+  const db = FirebaseAppConfig.getInstance().getDb();
+  const roomRef = doc(db, ROOMS_COLLECTION, roomId);
+
+  try {
+    const roomDoc = await getDoc(roomRef);
+    
+    if (!roomDoc.exists()) {
+      console.error("ChatRooms service: Room not found:", roomId);
+      return;
+    }
+
+    const roomData = roomDoc.data();
+    
+    if (!roomData) {
+      return;
+    }
+
+    const lastMessageSenderId = roomData.lastMessageSenderId;
+
+    if (lastMessageSenderId && lastMessageSenderId !== userId) {
+      await updateDoc(roomRef, {
+        lastMessageSenderId: null,
+      });
+    }
+  } catch (error) {
+    console.error("ChatRooms service: Error marking room as read:", error);
+    throw error;
+  }
 }

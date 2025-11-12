@@ -2,11 +2,13 @@ import { useAuthContext } from "@/context/Auth/AuthContext";
 import { useChat } from "@/context/Chat/ChatContext";
 import { useRef } from "react";
 import {
-    FlatList,
-    KeyboardAvoidingView,
-    Platform,
-    Text,
-    View,
+  FlatList,
+  Keyboard,
+  KeyboardAvoidingView,
+  Platform,
+  Text,
+  TouchableWithoutFeedback,
+  View,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { Message } from "../helper/messageService";
@@ -40,10 +42,21 @@ export default function ChatRoomScreen({
 
     try {
       await sendMessageToRoom(text);
+      scrollToBottom();
     } catch (error) {
       console.error("Error sending message:", error);
       throw error;
     }
+  };
+
+  const scrollToBottom = () => {
+    if (messages.length > 0) {
+      flatListRef.current?.scrollToEnd({ animated: true });
+    }
+  };
+
+  const handleDismissKeyboard = () => {
+    Keyboard.dismiss();
   };
 
   const renderMessage = ({ item }: { item: Message }) => {
@@ -70,12 +83,12 @@ export default function ChatRoomScreen({
   };
 
   return (
-    <KeyboardAvoidingView
-      behavior={Platform.OS === "ios" ? "padding" : "height"}
-      className="flex-1 bg-c1"
-      keyboardVerticalOffset={0}
-    >
-      <SafeAreaView className="flex-1 bg-c2" edges={["bottom"]}>
+    <SafeAreaView className="flex-1 bg-c2" edges={["top"]}>
+      <KeyboardAvoidingView
+        behavior={Platform.OS === "ios" ? "padding" : "height"}
+        className="flex-1"
+        keyboardVerticalOffset={Platform.OS === "ios" ? 0 : 20}
+      >
         <ChatRoomHeader
           userName={otherUserName}
           userEmail={otherUserEmail}
@@ -89,28 +102,30 @@ export default function ChatRoomScreen({
           </View>
         )}
 
-        <FlatList
-          ref={flatListRef}
-          data={messages}
-          keyExtractor={(item) => item.id}
-          renderItem={renderMessage}
-          contentContainerStyle={{
-            flexGrow: 1,
-            paddingTop: 16,
-            paddingBottom: 8,
-          }}
-          ListEmptyComponent={renderEmptyState}
-          showsVerticalScrollIndicator={false}
-          inverted={false}
-          onContentSizeChange={() => {
-            if (messages.length > 0) {
-              flatListRef.current?.scrollToEnd({ animated: true });
-            }
-          }}
-        />
+        <TouchableWithoutFeedback onPress={handleDismissKeyboard}>
+          <View className="flex-1">
+            <FlatList
+              ref={flatListRef}
+              data={messages}
+              keyExtractor={(item) => item.id}
+              renderItem={renderMessage}
+              contentContainerStyle={{
+                flexGrow: 1,
+                paddingHorizontal: 16,
+                paddingTop: 16,
+                paddingBottom: 8,
+              }}
+              ListEmptyComponent={renderEmptyState}
+              showsVerticalScrollIndicator={false}
+              inverted={false}
+              keyboardShouldPersistTaps="handled"
+              onContentSizeChange={scrollToBottom}
+            />
+          </View>
+        </TouchableWithoutFeedback>
 
         <MessageInput onSend={handleSendMessage} />
-      </SafeAreaView>
-    </KeyboardAvoidingView>
+      </KeyboardAvoidingView>
+    </SafeAreaView>
   );
 }

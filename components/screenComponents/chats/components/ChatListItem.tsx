@@ -103,8 +103,15 @@ export default function ChatListItem({ chat, index }: ChatListItemProps) {
           )}
         </View>
 
-        {/* Chevron Icon */}
-        <Ionicons name="chevron-forward" size={20} color="#C9B59C" />
+        {/* Unread Badge & Chevron Icon */}
+        <View className="flex-row items-center gap-2">
+          {chat.hasUnreadMessage && (
+            <View className="w-[20px] h-[20px] rounded-full bg-g1 flex-row items-center justify-center">
+              <Text className="font-bold" style={{color:'white'}}>{`!`}</Text>
+            </View>
+          )}
+          <Ionicons name="chevron-forward" size={20} color="#C9B59C" />
+        </View>
       </View>
     </TouchableOpacity>
     </Animated.View>
