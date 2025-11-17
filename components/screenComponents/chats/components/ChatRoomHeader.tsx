@@ -30,7 +30,6 @@ export default function ChatRoomHeader({
   return (
     <View 
       className="bg-c2 border-b border-c3/30 px-4 pb-3"
-      style={{ paddingTop: insets.top + 12 }}
     >
       <View className="flex-row items-center">
         {/* Back Button */}

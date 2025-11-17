@@ -16,6 +16,9 @@ export default function ChatsLayout() {
             <Stack
                 screenOptions={{
                     animation: 'slide_from_right',
+                    headerStyle: {
+                        backgroundColor: '#EFE9E3',
+                    }
                 }}
             >
                 <Stack.Screen name="index" options={{
@@ -32,8 +35,8 @@ export default function ChatsLayout() {
                     )
                 }} />
                 <Stack.Screen name="[roomId]" options={{
-                    headerShown:false
-                }}/>
+                    headerShown: false
+                }} />
             </Stack>
         </ChatRoomsProvider>
     );

@@ -4,8 +4,6 @@ import { useRef } from "react";
 import {
   FlatList,
   Keyboard,
-  KeyboardAvoidingView,
-  Platform,
   Text,
   TouchableWithoutFeedback,
   View,
@@ -15,6 +13,7 @@ import { Message } from "../helper/messageService";
 import ChatRoomHeader from "./ChatRoomHeader";
 import MessageBubble from "./MessageBubble";
 import MessageInput from "./MessageInput";
+import {KeyboardAwareScrollView} from "react-native-keyboard-controller";
 
 interface ChatRoomScreenProps {
   roomId: string;
@@ -83,49 +82,43 @@ export default function ChatRoomScreen({
   };
 
   return (
-    <SafeAreaView className="flex-1 bg-c2" edges={["top"]}>
-      <KeyboardAvoidingView
-        behavior={Platform.OS === "ios" ? "padding" : "height"}
-        className="flex-1"
-        keyboardVerticalOffset={Platform.OS === "ios" ? 0 : 20}
-      >
-        <ChatRoomHeader
-          userName={otherUserName}
-          userEmail={otherUserEmail}
-          profilePicture={otherUserProfilePicture}
-          onBackPress={onBackPress}
-        />
+    <SafeAreaView className="flex-1 bg-c2">
+      <ChatRoomHeader
+        userName={otherUserName}
+        userEmail={otherUserEmail}
+        profilePicture={otherUserProfilePicture}
+        onBackPress={onBackPress}
+      />
 
-        {error && (
-          <View className="bg-red-100 border border-red-400 px-4 py-2 mx-4 mt-2 rounded">
-            <Text className="text-red-700 text-sm">{error}</Text>
-          </View>
-        )}
+      {error && (
+        <View className="bg-red-100 border border-red-400 px-4 py-2 mx-4 mt-2 rounded">
+          <Text className="text-red-700 text-sm">{error}</Text>
+        </View>
+      )}
+    
+      <TouchableWithoutFeedback onPress={handleDismissKeyboard}>
+          <FlatList
+            ref={flatListRef}
+            data={messages}
+            keyExtractor={(item) => item.id}
+            renderItem={renderMessage}
+            contentContainerStyle={{
+              flexGrow: 1,
+              paddingHorizontal: 16,
+              paddingTop: 16,
+              paddingBottom: 8,
+            }}
+            ListEmptyComponent={renderEmptyState}
+            showsVerticalScrollIndicator={false}
+            inverted={false}
+            keyboardShouldPersistTaps="handled"
+            onContentSizeChange={scrollToBottom}
+            automaticallyAdjustKeyboardInsets
+            keyboardDismissMode="on-drag"
+          />
+      </TouchableWithoutFeedback>
 
-        <TouchableWithoutFeedback onPress={handleDismissKeyboard}>
-          <View className="flex-1">
-            <FlatList
-              ref={flatListRef}
-              data={messages}
-              keyExtractor={(item) => item.id}
-              renderItem={renderMessage}
-              contentContainerStyle={{
-                flexGrow: 1,
-                paddingHorizontal: 16,
-                paddingTop: 16,
-                paddingBottom: 8,
-              }}
-              ListEmptyComponent={renderEmptyState}
-              showsVerticalScrollIndicator={false}
-              inverted={false}
-              keyboardShouldPersistTaps="handled"
-              onContentSizeChange={scrollToBottom}
-            />
-          </View>
-        </TouchableWithoutFeedback>
-
-        <MessageInput onSend={handleSendMessage} />
-      </KeyboardAvoidingView>
+      <MessageInput onSend={handleSendMessage} />
     </SafeAreaView>
   );
 }
