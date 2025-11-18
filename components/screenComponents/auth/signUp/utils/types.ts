@@ -1,0 +1,1 @@
+export type SignUpSteps = 1 | 2 | 3;
