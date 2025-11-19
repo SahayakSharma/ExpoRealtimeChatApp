@@ -1,8 +1,9 @@
 import { useEffect } from "react";
 import { View } from "react-native";
 import Animated, { useAnimatedStyle, useSharedValue, withSpring } from "react-native-reanimated";
+import { swipeDirection } from "../utils/types";
 
-export default function AnimatedDash({className,value,activeValue}:{className?:string,value:number,activeValue:number}) {
+export default function AnimatedDash({className,value,activeValue,direction}:{className?:string,value:number,activeValue:number,direction:swipeDirection}) {
 
     const widthFactor = useSharedValue(0);
     const transformXFactor = useSharedValue(0);
@@ -16,21 +17,21 @@ export default function AnimatedDash({className,value,activeValue}:{className?:s
                 duration:1000
             });
         }
-        else if (activeValue === value + 1){
+        else if (activeValue === value + 1 && direction === swipeDirection.NEXT){
             transformXFactor.value = withSpring(DASH_WIDTH,{
                 duration:1000
             });
         }
-        else if(activeValue === 1 && value === 3){
-            transformXFactor.value = withSpring(DASH_WIDTH,{
+        else if(activeValue === value - 1 && direction === swipeDirection.PREVIOUS){
+            transformXFactor.value = withSpring(-DASH_WIDTH,{
                 duration:1000
             });
         }
-        else if(activeValue === value -1){
-            transformXFactor.value = withSpring(DASH_WIDTH,{
-                duration:1000
-            });
-        }
+        // else if(activeValue === 1 && value === 3 && direction === swipeDirection.NEXT){
+        //     transformXFactor.value = withSpring(DASH_WIDTH,{
+        //         duration:1000
+        //     });
+        // }
     }
 
     const animatedStyle = useAnimatedStyle(() => {
@@ -46,7 +47,7 @@ export default function AnimatedDash({className,value,activeValue}:{className?:s
     },[activeValue])
 
     return(
-        <View className={`w-[30px] h-[5px] rounded-md bg-c4 ${className} overflow-hidden`}>
+        <View className={`w-[30px] h-[5px] rounded-md bg-c4 ${className} overflow-hidden flex-row ${direction === swipeDirection.PREVIOUS && 'justify-end'}`}>
             <Animated.View style={[animatedStyle,{backgroundColor:'black',height:7}]}/>
         </View>
     )

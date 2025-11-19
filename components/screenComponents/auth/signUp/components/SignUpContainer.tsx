@@ -1,11 +1,12 @@
 import { useEffect, useState } from "react";
-import { SignUpSteps } from "../utils/types";
+import { SignUpSteps, swipeDirection } from "../utils/types";
 import { SafeAreaView } from "react-native-safe-area-context";
 import HeaderActiveStepBar from "./HeaderActiveStepBar";
 import { Gesture, GestureDetector, GestureHandlerRootView } from 'react-native-gesture-handler';
-import { Text } from "react-native";
+import { Text, View } from "react-native";
 import { useSharedValue } from "react-native-reanimated";
 import { runOnJS, scheduleOnRN } from "react-native-worklets";
+import SignUpStepManager from "./SignUpStepManager";
 
 
 
@@ -13,14 +14,17 @@ import { runOnJS, scheduleOnRN } from "react-native-worklets";
 
 export default function SignUpContainer() {
     const [currentStep, setCurrentStep] = useState<SignUpSteps>(1);
+    const [direction,setDirection]=useState<swipeDirection>(swipeDirection.NEXT);
     const currentStepShared = useSharedValue(1);
     function handleIncrementStep() {
+        setDirection(swipeDirection.NEXT);
         if (currentStep < 3) {
             setCurrentStep((prevStep) => (prevStep + 1) as SignUpSteps);
         }
     }
 
     function handleDecrementStep() {
+        setDirection(swipeDirection.PREVIOUS);
         if (currentStep > 1) {
             setCurrentStep((prevStep) => (prevStep - 1) as SignUpSteps);
         }
@@ -28,19 +32,21 @@ export default function SignUpContainer() {
 
     const panGesture = Gesture.Pan().onEnd((event) => {
         if (event.translationX > 1) {
-            runOnJS(handleIncrementStep)();
-        }
-        else {
             runOnJS(handleDecrementStep)();
         }
+        else {
+            runOnJS(handleIncrementStep)();
+        }
     })
-
+    
     return (
         <GestureHandlerRootView className="flex-1">
-            <SafeAreaView>
-                <HeaderActiveStepBar activeState={currentStep} />
+            <SafeAreaView className="flex-1">
+                <HeaderActiveStepBar activeState={currentStep} direction={direction}/>
                 <GestureDetector gesture={panGesture}>
-                    <Text className="text-white text-center mt-10 text-lg">Current Step: {currentStep}</Text>
+                    <View className="flex-1" collapsable={false}>
+                        <SignUpStepManager activeStep={currentStep}/>
+                    </View>
                 </GestureDetector>
             </SafeAreaView>
         </GestureHandlerRootView>
