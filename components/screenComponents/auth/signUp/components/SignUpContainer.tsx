@@ -31,21 +31,21 @@ export default function SignUpContainer() {
     }
 
     const panGesture = Gesture.Pan().onEnd((event) => {
-        if (event.translationX > 1) {
+        if (event.translationX > 50) {
             runOnJS(handleDecrementStep)();
         }
-        else {
+        else if (event.translationX < -50) {
             runOnJS(handleIncrementStep)();
         }
     })
     
     return (
         <GestureHandlerRootView className="flex-1">
-            <SafeAreaView className="flex-1">
+            <SafeAreaView className="flex-1" edges={['top']}>
                 <HeaderActiveStepBar activeState={currentStep} direction={direction}/>
                 <GestureDetector gesture={panGesture}>
                     <View className="flex-1" collapsable={false}>
-                        <SignUpStepManager activeStep={currentStep}/>
+                        <SignUpStepManager activeStep={currentStep} nextStep={handleIncrementStep} prevStep={handleDecrementStep}/>
                     </View>
                 </GestureDetector>
             </SafeAreaView>
